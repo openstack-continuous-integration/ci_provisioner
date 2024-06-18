@@ -1,0 +1,5 @@
+- import_tasks: docker.yaml
+  tags: install
+
+- import_tasks: packages.yaml
+  tags: install
