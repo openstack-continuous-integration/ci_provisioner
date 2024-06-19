@@ -10,6 +10,7 @@ env:
   ANSIBLE_INVENTORY_SCRIPT_PATH: '{{.PROVISIONER_REPO_PATH}}/inventory-ansible.pkgx'
   ANSIBLE_PLAYBOOKS_PATH: '{{.PROVISIONER_REPO_PATH}}/playbooks'
   ANSIBLE_ROLES_PATH: '{{.PROVISIONER_REPO_PATH}}/roles'
+  ANSIBLE_DEBUG: 0
 
 tasks:
   default:
@@ -61,6 +62,37 @@ tasks:
         set -a
         ANSIBLE_ROLES_PATH="{{.ANSIBLE_ROLES_PATH}}"
         ANSIBLE_HOST_KEY_CHECKING=false
+        ANSIBLE_DEBUG="{{.ANSIBLE_DEBUG}}"
+        set +a
+
+        eval "$(pkgx +openssh.com^{{.OPENSSH_VERSION}} ssh-agent)" 2>&1 > /dev/null
+        pkgx +openssh.com^{{.OPENSSH_VERSION}} \
+             ssh-add -q "{{.CONSTRUCTOR_SSH_KEY_PATH}}" 2>&1 > /dev/null
+        pkgx +ansible.com^{{.ANSIBLE_VERSION}} \
+             ansible-playbook \
+                 --inventory '{{.ANSIBLE_INVENTORY_SCRIPT_PATH}}' \
+                 '{{.ANSIBLE_PLAYBOOKS_PATH}}/main.yaml'
+        pkgx +openssh.com^{{.OPENSSH_VERSION}} \
+             ssh-agent -k 2>&1 > /dev/null
+    cmds:
+    - task: with-clean-env
+      vars:
+        COMMAND_SCRIPT: '{{.COMMAND_SCRIPT}}'
+
+  tests:
+    desc: run tests
+    vars:
+      ANSIBLE_TAGS: tests
+      CONSTRUCTOR_SSH_KEY_PATH:
+        sh: |
+          pkgx +taskfile.dev^{{.TASK_VERSION}} task \
+               --silent \
+               --taskfile '{{.PROJECT_REPO_PATH}}/Taskfile.yaml' \
+               constructor:get_ssh_key_path
+      COMMAND_SCRIPT: |
+        set -a
+        ANSIBLE_ROLES_PATH="{{.ANSIBLE_ROLES_PATH}}"
+        ANSIBLE_HOST_KEY_CHECKING=false
         ANSIBLE_DEBUG=1
         set +a
 
@@ -70,10 +102,9 @@ tasks:
         pkgx +ansible.com^{{.ANSIBLE_VERSION}} \
              ansible-playbook \
                  --inventory '{{.ANSIBLE_INVENTORY_SCRIPT_PATH}}' \
-                 -vvv \
                  '{{.ANSIBLE_PLAYBOOKS_PATH}}/main.yaml'
         pkgx +openssh.com^{{.OPENSSH_VERSION}} \
-             ssh-agent -k 2>&1 > /dev/null
+             ssh-agent -k 2>&1 > /dev/null        
     cmds:
     - task: with-clean-env
       vars:
