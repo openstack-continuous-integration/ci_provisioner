@@ -93,7 +93,7 @@ tasks:
         set -a
         ANSIBLE_ROLES_PATH="{{.ANSIBLE_ROLES_PATH}}"
         ANSIBLE_HOST_KEY_CHECKING=false
-        ANSIBLE_DEBUG=1
+        ANSIBLE_DEBUG="{{.ANSIBLE_DEBUG}}"
         set +a
 
         eval "$(pkgx +openssh.com^{{.OPENSSH_VERSION}} ssh-agent)" 2>&1 > /dev/null
