@@ -1,4 +1,4 @@
-- import_tasks: docker.yaml
+- import_tasks: install_docker.yaml
   tags: install
 
 - import_tasks: packages.yaml
@@ -6,3 +6,6 @@
 
 - import_tasks: pkgx.yaml
   tags: install
+
+- import_tasks: test_docker.yaml
+  tags: tests

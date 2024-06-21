@@ -1,0 +1,44 @@
+- name: Push Dockerfile for tests
+  ansible.builtin.copy:
+    src: Dockerfile
+    dest: Dockerfile
+
+#
+# https://github.com/docker/buildx/issues/59
+#   Building images for multi-arch with --load parameter fails
+# ==> you should use --push on multi-platform,
+#                use --load for single-platform。
+#
+- name: Test multiarch build
+  ansible.builtin.command: |
+    docker buildx build \
+           --load \
+           --no-cache \
+           --progress plain \
+           --platform linux/arm64 \
+           --tag test-buildx \
+           .
+  register: result
+
+- debug: msg="{{result.stderr_lines}}"
+
+- name: List docker images
+  ansible.builtin.command: |
+    docker image ls
+  register: result
+
+- debug: msg="{{result.stdout_lines}}"
+
+- name: Docker cleanup
+  ansible.builtin.command: |
+    docker system prune --force
+  register: result
+
+- debug: msg="{{result.stdout_lines}}"
+
+- name: List docker images
+  ansible.builtin.command: |
+    docker image ls
+  register: result
+
+- debug: msg="{{result.stdout_lines}}"

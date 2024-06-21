@@ -6,7 +6,7 @@ function get_ssh_key_path {
            '%s' \
            "$( \
               pkgx +taskfile.dev task \
-                -s \
+                --silent \
                 --taskfile ${parent_script_dir_path}/Taskfile.yml \
                 constructor:get_ssh_key_path \
           )"
@@ -18,7 +18,7 @@ function get_remote_fqdn {
            '%s' \
            "$( \
               pkgx +taskfile.dev task \
-                -s \
+                --silent \
                 --taskfile ${parent_script_dir_path}/Taskfile.yml \
                 constructor:get_remote_fqdn \
           )"
@@ -30,7 +30,7 @@ function get_remote_user {
            '%s' \
            "$( \
               pkgx +taskfile.dev task \
-                -s \
+                --silent \
                 --taskfile ${parent_script_dir_path}/Taskfile.yml \
                 constructor:get_remote_user \
           )"

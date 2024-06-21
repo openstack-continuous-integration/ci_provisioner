@@ -5,7 +5,7 @@
 
 - name: Add Docker Repository
   apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    repo: deb https://download.docker.com/linux/ubuntu noble stable
     state: present
 
 - name: Update apt and install docker-ce
@@ -22,5 +22,4 @@
     append: true
 
 - name: Configure docker with multi-arch support
-  ansible.builtin.shell:
-    cmd: docker buildx create --use --name multi-arch-builder
+  ansible.builtin.command: docker buildx create --use --name multi-arch-builder
